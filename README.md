@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flip Tracker
 
-## Getting Started
+A small web app for tracking balisong practice — mark which tricks you can do,
+log sessions, build combos, keep notes. Works without an account (data lives
+in your browser); signing in syncs it to your account.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router) and React 19
+- Tailwind v4 with shadcn/ui primitives
+- Supabase for auth + Postgres
+- TanStack Query for server state
+- dnd-kit for the combo editor
+
+## Running it locally
 
 ```bash
+git clone <this repo>
+cd flip-tracker
+npm install
+cp .env.example .env.local
+# fill in your Supabase URL + anon key + service-role key
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The dev server starts on http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Supabase setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a project at https://supabase.com.
+2. In **Project Settings → API**, copy the Project URL, anon key, and
+   service-role key into `.env.local`.
+3. Open the SQL editor and run, in order:
+   - `supabase/schema.sql`
+   - `supabase/seed.sql`
+   - everything in `supabase/migrations/` (lowest number first)
+4. In **Authentication → URL Configuration**, set the Site URL + Redirect URLs
+   to your local + production URLs so email-confirm links land somewhere real.
 
-## Learn More
+## How it's organized
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  (app)/             auth-aware app shell: dashboard, tricks, sessions, combos, notes
+  api/               route handlers (tricks, sessions, combos, notes, status)
+  auth/              sign in / sign up
+components/
+  nav/               top nav, theme toggle
+  player/            (unused here — leftover from the music-app sibling)
+  providers/         Query / Auth / Theme contexts
+  trick/             cards, pickers, filters, status pill
+  combo/             sortable list for the editor
+hooks/               TanStack Query wrappers (useQuery*, useExecute*)
+lib/
+  supabase/          server + browser + admin clients
+  api.ts             client-side fetch wrapper; routes guests to localStorage
+  localStore.ts      guest-mode storage (sessions, combos, notes, status)
+  migrate.ts         pushes localStorage data to Supabase on sign-in
+  video.ts           YouTube/Vimeo oEmbed fetcher + thumbnail helpers
+supabase/
+  schema.sql         tables + RLS
+  seed.sql           canonical trick catalog (~25 entries)
+  migrations/        ordered DDL + data backfills (video links, notes table, etc.)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Guest mode
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The app works fully without an account — trick statuses, sessions, combos and
+notes are kept in `localStorage` under the `flip.local.*` keys. When a guest
+signs up or signs in, `migrate.ts` pushes everything to Supabase, wipes the
+local copy, and the UI refetches against the server.
 
-## Deploy on Vercel
+Trick library reads are server-backed for everyone (RLS lets the `anon` role
+select rows where `is_public = true`) so the seeded tricks show up immediately.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploying
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This is a stock Next.js app, so any Node host works. I run it on Vercel:
+
+```bash
+npx vercel              # first deploy → preview URL
+npx vercel --prod       # promote to production
+```
+
+Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and
+`SUPABASE_SERVICE_ROLE_KEY` in the Vercel project's env settings, then add the
+Vercel URL to Supabase's Site URL + Redirect URLs.
+
+## Credit
+
+Every reference video in the trick library is someone else's tutorial. The
+in-app `/credits` page lists all the channels we link to — Big Flips, Squid
+Industries, Calvin Van Arragon, Bali Tube, Benshamin Flips, cutlerylover,
+lqkii_alt, Andux Balisong. Go subscribe to them.
+
+## License
+
+MIT — do whatever, just don't claim someone else's tutorial videos as your own.
