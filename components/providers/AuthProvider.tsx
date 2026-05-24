@@ -16,6 +16,7 @@ interface AuthValue {
   signIn: (email: string, password: string) => Promise<{ error: { message: string } | null }>;
   signUp: (email: string, password: string) => Promise<{ error: { message: string } | null; needsConfirmation: boolean }>;
   signOut: () => Promise<void>;
+  resendConfirmation: (email: string) => Promise<{ error: { message: string } | null }>;
 }
 
 const AuthContext = createContext<AuthValue | null>(null);
@@ -91,6 +92,10 @@ export function AuthProvider({ children, initialSession }: Props) {
       },
       signOut: async () => {
         await supabase.auth.signOut();
+      },
+      resendConfirmation: async (email) => {
+        const { error } = await supabase.auth.resend({ type: 'signup', email });
+        return { error: error ? { message: error.message } : null };
       },
     }),
     [session, loading, supabase],
