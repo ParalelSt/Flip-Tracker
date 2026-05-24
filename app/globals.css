@@ -1,0 +1,184 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------- Flip-Tracker design tokens (DESIGN.md aligned) ----------
+   - Clean SaaS aesthetic, Linear/Stripe-ish, dark by default.
+   - 8px spacing rhythm, 16px radius for cards, soft shadows.
+   - Two accents max: warm "blade" amber + cool muted neutral.        */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-destructive: var(--destructive);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-blade: var(--blade);
+  --color-blade-soft: var(--blade-soft);
+
+  /* Status colors — semantically meaningful, used as solid pills/badges. */
+  --color-status-learning: var(--status-learning);
+  --color-status-clean: var(--status-clean);
+  --color-status-mastered: var(--status-mastered);
+  --color-status-idle: var(--status-idle);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-sans);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+}
+
+:root {
+  /* Bright red-on-white theme — DESIGN.md "minimal but warm".
+     Crisp off-white surfaces, near-black text, single confident red accent
+     (Linear/Stripe energy). Status colors stay distinct from the brand red. */
+  --background:    oklch(0.99 0.002 25);
+  --foreground:    oklch(0.20 0.01 250);
+  --surface:       oklch(0.99 0.002 25);
+  --surface-2:     oklch(0.96 0.005 25);
+  --card:          oklch(1 0 0);
+  --card-foreground: oklch(0.20 0.01 250);
+  --popover:       oklch(1 0 0);
+  --popover-foreground: oklch(0.20 0.01 250);
+  --primary:       oklch(0.22 0.01 250);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary:     oklch(0.96 0.004 25);
+  --secondary-foreground: oklch(0.22 0.01 250);
+  --muted:         oklch(0.95 0.006 25);
+  --muted-foreground: oklch(0.48 0.01 250);
+  --accent:        oklch(0.95 0.04 25);
+  --accent-foreground: oklch(0.40 0.18 25);
+  --destructive:   oklch(0.55 0.22 25);
+  --border:        oklch(0 0 0 / 8%);
+  --input:         oklch(0 0 0 / 12%);
+  --ring:          oklch(0.60 0.22 25);
+  --radius:        16px;
+  /* Sidebar: pale rose anchor so the brand red feels native to the chrome. */
+  --sidebar:       oklch(0.97 0.012 25);
+  --sidebar-foreground: oklch(0.24 0.01 250);
+  --sidebar-primary: oklch(0.60 0.22 25);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.93 0.02 25);
+  --sidebar-accent-foreground: oklch(0.22 0.01 250);
+  --sidebar-border: oklch(0 0 0 / 7%);
+  --sidebar-ring: oklch(0.60 0.22 25);
+
+  /* Brand: confident scarlet. Token name stays `--blade` so we don't rename
+     every consumer; semantically still "the one accent". */
+  --blade:         oklch(0.60 0.22 25);
+  --blade-soft:    oklch(0.68 0.19 25);
+
+  /* Status palette — kept perceptually distinct from the brand red so
+     "clean" doesn't visually overlap with brand buttons. */
+  --status-idle:     oklch(0.55 0.01 250);
+  --status-learning: oklch(0.55 0.18 240);
+  --status-clean:    oklch(0.66 0.17 70);
+  --status-mastered: oklch(0.58 0.17 145);
+}
+
+.dark {
+  --background:    oklch(0.16 0.008 25);
+  --foreground:    oklch(0.98 0 0);
+  --surface:       oklch(0.20 0.008 25);
+  --surface-2:     oklch(0.24 0.008 25);
+  --card:          oklch(0.20 0.008 25);
+  --card-foreground: oklch(0.98 0 0);
+  --popover:       oklch(0.22 0.008 25);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary:       oklch(0.98 0 0);
+  --primary-foreground: oklch(0.18 0.008 25);
+  --secondary:     oklch(0.26 0.008 25);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted:         oklch(0.24 0.008 25);
+  --muted-foreground: oklch(0.72 0.008 25);
+  --accent:        oklch(0.30 0.05 25);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive:   oklch(0.68 0.22 25);
+  --border:        oklch(1 0 0 / 10%);
+  --input:         oklch(1 0 0 / 14%);
+  --ring:          oklch(0.70 0.22 25);
+  --sidebar:       oklch(0.13 0.01 25);
+  --sidebar-foreground: oklch(0.95 0 0);
+  --sidebar-primary: oklch(0.70 0.22 25);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.22 0.012 25);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(1 0 0 / 7%);
+  --sidebar-ring: oklch(0.70 0.22 25);
+  --blade:         oklch(0.70 0.22 25);
+  --blade-soft:    oklch(0.78 0.18 25);
+  --status-idle:     oklch(0.62 0.01 250);
+  --status-learning: oklch(0.72 0.16 240);
+  --status-clean:    oklch(0.78 0.14 70);
+  --status-mastered: oklch(0.70 0.18 145);
+}
+
+@layer base {
+  html, body, #__next { height: 100%; }
+  /* Bump the root size so every rem-based Tailwind text class scales up a
+     touch (text-sm → ~15px, text-base → 17px) without per-component churn. */
+  html { font-size: 17px; }
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01" on, "cv11" on;
+  }
+  /* Slim, low-contrast scrollbars that fade in on hover — premium feel. */
+  * { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+  *:hover { scrollbar-color: color-mix(in oklab, var(--foreground) 18%, transparent) transparent; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 999px;
+    transition: background 160ms ease;
+  }
+  *:hover::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--foreground) 14%, transparent);
+  }
+  *:hover::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--foreground) 28%, transparent);
+  }
+  ::selection { background: color-mix(in oklab, var(--blade) 35%, transparent); }
+
+  /* Hide native number-input spinners everywhere — we use a custom stepper. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+}
+
+@layer utilities {
+  .shadow-soft { box-shadow: 0 1px 2px rgba(0,0,0,.20), 0 6px 24px -8px rgba(0,0,0,.45); }
+  .shadow-glow { box-shadow: 0 8px 30px -12px color-mix(in oklab, var(--blade) 60%, transparent); }
+  .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+}
