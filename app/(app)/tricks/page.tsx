@@ -7,6 +7,7 @@ import { TrickCard } from '@/components/trick/TrickCard';
 import { TrickFilters } from '@/components/trick/TrickFilters';
 import { AddCustomTrickDialog } from '@/components/trick/AddCustomTrickDialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { BackToTop } from '@/components/BackToTop';
 import type { TrickCategory, TrickStatus } from '@/types';
 
 export default function TricksPage() {
@@ -64,6 +65,8 @@ export default function TricksPage() {
           ))}
         </div>
       )}
+
+      <BackToTop />
     </div>
   );
 }
