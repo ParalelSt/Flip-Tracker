@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { fromError, jsonError, requireUser, UnauthorizedError, unauthorizedResponse } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 import { mapTrick, mapTrickWithStatus } from '@/lib/mapRow';
 import { fetchVideoMetadata } from '@/lib/video';
 import { TRICK_CATEGORIES } from '@/types';
@@ -22,18 +23,39 @@ function buildSelector(id: string) {
 
 export async function GET(_req: NextRequest, ctx: RouteContext<'/api/tricks/[id]'>) {
   try {
-    const { supabase } = await requireUser();
+    // Anon-friendly: RLS lets unauthenticated callers read public tricks.
+    // Authed users get the per-user status join; guests get default status.
+    const supabase = await createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    const isAuthed = !!userData?.user;
     const { id } = await ctx.params;
     const sel = buildSelector(id);
+
+    if (isAuthed) {
+      const { data, error } = await supabase
+        .from('tricks')
+        .select('*, user_trick_status(status, notes, updated_at)')
+        .eq(sel.column, sel.value)
+        .single();
+      if (error || !data) return jsonError('Trick not found', 404);
+      return Response.json({ trick: mapTrickWithStatus(data) });
+    }
+
     const { data, error } = await supabase
       .from('tricks')
-      .select('*, user_trick_status(status, notes, updated_at)')
+      .select('*')
       .eq(sel.column, sel.value)
       .single();
     if (error || !data) return jsonError('Trick not found', 404);
-    return Response.json({ trick: mapTrickWithStatus(data) });
+    return Response.json({
+      trick: {
+        ...mapTrick(data),
+        status: 'not_started' as const,
+        notes: null,
+        updatedAt: null,
+      },
+    });
   } catch (e) {
-    if (e instanceof UnauthorizedError) return unauthorizedResponse();
     return fromError(e);
   }
 }
