@@ -5,9 +5,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
-  HomeIcon, LibraryIcon, SessionsIcon, CombosIcon, LogOutIcon, BalisongLogo,
+  HomeIcon, LibraryIcon, SessionsIcon, CombosIcon, LogOutIcon, MenuIcon, BalisongLogo,
 } from '@/components/icons';
-import { StickyNote, BookOpen, Users, Heart } from 'lucide-react';
+import { StickyNote, BookOpen, Compass, Users, Heart } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
@@ -20,7 +20,6 @@ const NAV = [
   { href: '/tricks', label: 'Tricks', icon: LibraryIcon },
   { href: '/sessions', label: 'Sessions', icon: SessionsIcon },
   { href: '/combos', label: 'Combos', icon: CombosIcon },
-  { href: '/notes', label: 'Notes', icon: StickyNote },
 ];
 
 
@@ -67,6 +66,89 @@ export function TopNav() {
 
         <ThemeToggle className="h-10 w-10" />
 
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger
+            className={cn(
+              'grid place-items-center h-10 shrink-0 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+              user
+                ? 'w-10 rounded-full bg-blade text-white text-sm font-bold'
+                : 'w-10 rounded-lg text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+            )}
+            aria-label={user ? 'Account menu' : 'Menu'}
+          >
+            {user ? user.email?.[0]?.toUpperCase() ?? '?' : <MenuIcon className="h-5 w-5" />}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-64 p-1.5">
+            {user && (
+              <>
+                <DropdownMenuLabel email={user.email ?? ''} />
+                <DropdownMenuSeparator />
+              </>
+            )}
+            {/* Site links — promoted with badge-styled icons + larger rows so
+                they don't get lost in the menu. */}
+            <DropdownMenuItem
+              onClick={() => router.push('/notes')}
+              className="gap-3 py-2.5 text-sm font-medium"
+            >
+              <span className="grid place-items-center h-7 w-7 rounded-md bg-blade/15 text-blade shrink-0">
+                <StickyNote className="h-3.5 w-3.5" />
+              </span>
+              Notes
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => router.push('/guide')}
+              className="gap-3 py-2.5 text-sm font-medium"
+            >
+              <span className="grid place-items-center h-7 w-7 rounded-md bg-blade/15 text-blade shrink-0">
+                <BookOpen className="h-3.5 w-3.5" />
+              </span>
+              How it works
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => router.push('/balisong-guide')}
+              className="gap-3 py-2.5 text-sm font-medium"
+            >
+              <span className="grid place-items-center h-7 w-7 rounded-md bg-blade/15 text-blade shrink-0">
+                <Compass className="h-3.5 w-3.5" />
+              </span>
+              Balisong guide
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => router.push('/credits')}
+              className="gap-3 py-2.5 text-sm font-medium"
+            >
+              <span className="grid place-items-center h-7 w-7 rounded-md bg-blade/15 text-blade shrink-0">
+                <Users className="h-3.5 w-3.5" />
+              </span>
+              Credits
+            </DropdownMenuItem>
+            {/* Donate row — accented with a red heart + small chip, no
+                background flood so it reads as a quiet CTA in the menu. */}
+            <DropdownMenuItem
+              onClick={() => router.push('/donate')}
+              className="gap-3 py-2.5 text-sm font-medium"
+            >
+              <span className="grid place-items-center h-7 w-7 rounded-md bg-blade/15 text-blade shrink-0">
+                <Heart className="h-3.5 w-3.5 fill-current animate-pulse" />
+              </span>
+              <span className="flex-1 text-left">Support the project</span>
+              <span className="text-[10px] uppercase tracking-widest text-blade font-semibold">Donate</span>
+            </DropdownMenuItem>
+            {user && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => signOut()}
+                  className="gap-3 py-2 text-sm text-destructive"
+                >
+                  <LogOutIcon className="h-3.5 w-3.5" /> Sign out
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {!user && (
           <Link
             href="/auth"
@@ -74,60 +156,6 @@ export function TopNav() {
           >
             Sign in
           </Link>
-        )}
-
-        {user && (
-          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-            <DropdownMenuTrigger
-              className="grid place-items-center h-10 w-10 rounded-full bg-blade text-white text-sm font-bold shrink-0 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-              aria-label="Account menu"
-            >
-              {user.email?.[0]?.toUpperCase() ?? '?'}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-64 p-1.5">
-              <DropdownMenuLabel email={user.email ?? ''} />
-              <DropdownMenuSeparator />
-              {/* Site links — promoted with badge-styled icons + larger rows so
-                  they don't get lost in the menu. */}
-              <DropdownMenuItem
-                onClick={() => router.push('/guide')}
-                className="gap-3 py-2.5 text-sm font-medium"
-              >
-                <span className="grid place-items-center h-7 w-7 rounded-md bg-blade/15 text-blade shrink-0">
-                  <BookOpen className="h-3.5 w-3.5" />
-                </span>
-                How it works
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => router.push('/credits')}
-                className="gap-3 py-2.5 text-sm font-medium"
-              >
-                <span className="grid place-items-center h-7 w-7 rounded-md bg-blade/15 text-blade shrink-0">
-                  <Users className="h-3.5 w-3.5" />
-                </span>
-                Credits
-              </DropdownMenuItem>
-              {/* Donate row — accented with a red heart + small chip, no
-                  background flood so it reads as a quiet CTA in the menu. */}
-              <DropdownMenuItem
-                onClick={() => router.push('/donate')}
-                className="gap-3 py-2.5 text-sm font-medium"
-              >
-                <span className="grid place-items-center h-7 w-7 rounded-md bg-blade/15 text-blade shrink-0">
-                  <Heart className="h-3.5 w-3.5 fill-current animate-pulse" />
-                </span>
-                <span className="flex-1 text-left">Support the project</span>
-                <span className="text-[10px] uppercase tracking-widest text-blade font-semibold">Donate</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => signOut()}
-                className="gap-3 py-2 text-sm text-destructive"
-              >
-                <LogOutIcon className="h-3.5 w-3.5" /> Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         )}
       </div>
     </header>
